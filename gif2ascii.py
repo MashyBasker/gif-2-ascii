@@ -15,7 +15,7 @@ def convert_gif_to_frames(gif):
         try:
             ok, frame = gif.read()
             if not ok:
-                print("FUCKKK")
+                print("Err: Unable to read GIF frame")
                 break
             frame = cv2.resize(frame, (100,50))
             frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)

@@ -10,7 +10,8 @@ import sys
 text = "$@B%8&WM#*oahkbdpqwmZO0QLCJUYXzcvunxrjft/\|()1{}[]?-_+~<>i!lI;:,\"^`'. "
 def convert_gif_to_frames(gif):
     num = 0
-    frames = []
+    gray_frames = []
+    color_frames = []
     _, frame = gif.read()
     while True:
         try:
@@ -19,18 +20,25 @@ def convert_gif_to_frames(gif):
                 print("Err: Unable to read GIF frame")
                 break
             frame = cv2.resize(frame, (100,50))
-            frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-            frames.append(frame)
+            gframe = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+            color_frame = frame
+            gray_frames.append(gframe)
+            color_frames.append(color_frame)
             num += 1
         except KeyboardInterrupt:
             break
     gif.release()
-    return frames
+    return gray_frames, color_frames
+
+def rgb_display(char, r, g, b):
+    color = f"\033[38;2;{r};{g};{b}m"
+    reset = "\033[0m"
+    print(f"{color}{char}{reset}",end="")
 
 
-def frame_to_ascii(frame, n):
+def frame_to_ascii(gframe, cframe, n):
     out = []
-    img = np.array(frame)
+    img = np.array(gframe)
     h, w = img.shape
     for i in range(h):
         row = []
@@ -40,7 +48,8 @@ def frame_to_ascii(frame, n):
     os.system("clear")
     for i in range(h):
         for j in range(w):
-            print(out[i][j], end="")
+            b, g, r = cframe[i][j]
+            rgb_display(out[i][j], r, g, b)
         print()
 
 def main():
@@ -49,13 +58,13 @@ def main():
     gif = cv2.VideoCapture(gif_path)
     if not gif.isOpened():
         print("Err: Can't open")
-    frame_list = convert_gif_to_frames(gif)
-    d = len(frame_list)
+    gray, color = convert_gif_to_frames(gif)
+    d = len(gray)
     idx = 0
     while True:
-        frame_to_ascii(frame_list[idx], n)
+        frame_to_ascii(gray[idx], color[idx], n)
         idx = (idx+1)%d
-        sleep(0.03)
+        sleep(0.05)
 
 if __name__ == '__main__':
     main()

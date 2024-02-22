@@ -3,6 +3,7 @@ import numpy as np
 import math
 import os
 from time import sleep
+import sys
 
 
 #text = "#$@&MH%?;:=^~-"[::-1]
@@ -43,8 +44,9 @@ def frame_to_ascii(frame, n):
         print()
 
 def main():
+    gif_path = sys.argv[1]
     n = len(text)
-    gif = cv2.VideoCapture('./cubes.gif')
+    gif = cv2.VideoCapture(gif_path)
     if not gif.isOpened():
         print("Err: Can't open")
     frame_list = convert_gif_to_frames(gif)
